@@ -10,6 +10,6 @@ public class DemoTask implements ITask {
 
   @Override
   public void execute() {
-
+    System.out.println("run task....");
   }
 }
