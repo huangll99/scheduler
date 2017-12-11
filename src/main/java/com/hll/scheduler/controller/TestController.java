@@ -4,6 +4,7 @@ import com.hll.scheduler.job.PrintJob;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Set;
 public class TestController extends BaseController {
 
 
-  @RequestMapping("/demo")
+  @RequestMapping(value = "/demo" ,method = RequestMethod.GET)
   public String demo() {
 
     try {
@@ -65,7 +66,7 @@ public class TestController extends BaseController {
     return "ok";
   }
 
-  @RequestMapping("/add")
+  @RequestMapping(value = "/add",method = RequestMethod.GET)
   public String add() throws SchedulerException {
     JobDetail jobDetail = JobBuilder.newJob(PrintJob.class)
         .withIdentity("print", "demo")

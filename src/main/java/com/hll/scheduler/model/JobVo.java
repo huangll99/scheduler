@@ -12,5 +12,4 @@ public class JobVo {
   private String desc;
 
 
-
 }
