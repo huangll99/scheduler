@@ -5,7 +5,6 @@ import com.hll.scheduler.anotation.Task;
 import com.hll.scheduler.model.SimpleJob;
 import com.hll.scheduler.model.TaskClassInfo;
 import com.hll.scheduler.service.QuartzService;
-import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +27,8 @@ public class TaskController {
   @Resource
   private WebApplicationContext webApplicationContext;
 
- @Autowired
- private QuartzService quartzService;
+  @Autowired
+  private QuartzService quartzService;
 
   /**
    * 在Spring的容器中查找加了@Task注解的bean，获取其class
@@ -39,7 +38,7 @@ public class TaskController {
     ArrayList<TaskClassInfo> res = Lists.newArrayList();
 
     Map<String, Object> taskBeans = webApplicationContext.getBeansWithAnnotation(Task.class);
-    for (Map.Entry<String, Object> entry:taskBeans.entrySet()){
+    for (Map.Entry<String, Object> entry : taskBeans.entrySet()) {
       TaskClassInfo taskClassInfo = new TaskClassInfo(entry.getKey(), entry.getValue().getClass().getCanonicalName());
       res.add(taskClassInfo);
     }
@@ -51,29 +50,45 @@ public class TaskController {
    * repeatInterval:每个多长时间执行一次
    * repeatCount:执行多少次，-1表示永远执行
    */
-  @RequestMapping(value = "simple",method = RequestMethod.POST)
-  public String addSimpleTask(@RequestBody SimpleJob simpleJob){
+  @RequestMapping(value = "/simple", method = RequestMethod.POST)
+  public String addSimpleTask(@RequestBody SimpleJob simpleJob) {
     quartzService.addSimpleJob(simpleJob);
     return "ok";
   }
 
   /**
-   * 查询任务列表
+   * 查询任务列表，simple task
    */
-
+  @RequestMapping(value = "/simpleList", method = RequestMethod.GET)
+  public List<SimpleJob> getSimpleTaskList() {
+    return quartzService.getSimpleTaskList();
+  }
 
   /**
    * 暂停任务
    */
+  @RequestMapping(value = "pauseJob", method = RequestMethod.POST)
+  public String pauseJob(String group, String jobKey) {
+    quartzService.stopTask(group,jobKey);
+    return "ok";
+  }
 
   /**
    * 恢复任务执行
    */
-
+  @RequestMapping(value = "resumeJob", method = RequestMethod.POST)
+  public String resumeJob(String group, String jobKey) {
+    quartzService.resumeJob(group,jobKey);
+    return "ok";
+  }
 
   /**
    * 删除任务
    */
 
-
+  @RequestMapping(value = "removeJob",method = RequestMethod.POST)
+  public String removeJob(String group, String jobKey){
+    quartzService.removeJob(group,jobKey);
+    return "ok";
+  }
 }

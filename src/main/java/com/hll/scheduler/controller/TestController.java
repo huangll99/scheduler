@@ -3,6 +3,7 @@ package com.hll.scheduler.controller;
 import com.hll.scheduler.job.PrintJob;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,14 +16,16 @@ import java.util.Set;
  */
 @RequestMapping("/test")
 @RestController
-public class TestController extends BaseController {
+public class TestController {
 
+  @Autowired
+  private Scheduler scheduler;
 
-  @RequestMapping(value = "/demo",method = RequestMethod.GET)
+  @RequestMapping(value = "/demo", method = RequestMethod.GET)
   public String demo() {
 
     try {
-      List<String> jobGroupNames = super.scheduler.getJobGroupNames();
+      List<String> jobGroupNames = scheduler.getJobGroupNames();
       jobGroupNames.forEach(group -> {
         System.out.println(group);
         try {
@@ -33,7 +36,7 @@ public class TestController extends BaseController {
             System.out.println(trigger.getNextFireTime());
           }
 
-          Set<JobKey> jobKeys = super.scheduler.getJobKeys(GroupMatcher.groupEquals(group));
+          Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.groupEquals(group));
           for (JobKey jobKey : jobKeys) {
             JobDetail jobDetail = scheduler.getJobDetail(jobKey);
             System.out.println(jobDetail.getKey());
@@ -48,7 +51,7 @@ public class TestController extends BaseController {
                 System.out.println(triggerState.ordinal());
                 JobDataMap jobDataMap = trigger.getJobDataMap();
                 jobDataMap.forEach((key, value) -> {
-                  System.out.println(key);
+                  System.out.print(key+" : ");
                   System.out.println(value);
                 });
               } catch (SchedulerException e) {
@@ -66,7 +69,7 @@ public class TestController extends BaseController {
     return "ok";
   }
 
-  @RequestMapping(value = "/add",method = RequestMethod.GET)
+  @RequestMapping(value = "/add", method = RequestMethod.GET)
   public String add() throws SchedulerException {
     JobDetail jobDetail = JobBuilder.newJob(PrintJob.class)
         .withIdentity("print", "demo")
@@ -80,7 +83,7 @@ public class TestController extends BaseController {
         .usingJobData("cron", "forever/5")
         .build();
 
-    super.scheduler.scheduleJob(jobDetail, trigger);
+    scheduler.scheduleJob(jobDetail, trigger);
     return "ok";
   }
 }
