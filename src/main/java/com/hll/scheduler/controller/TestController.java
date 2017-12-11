@@ -18,7 +18,7 @@ import java.util.Set;
 public class TestController extends BaseController {
 
 
-  @RequestMapping(value = "/demo" ,method = RequestMethod.GET)
+  @RequestMapping(value = "/demo",method = RequestMethod.GET)
   public String demo() {
 
     try {
